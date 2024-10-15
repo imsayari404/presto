@@ -26,6 +26,7 @@ import com.facebook.presto.eventlistener.EventListenerManager;
 import com.facebook.presto.execution.resourceGroups.ResourceGroupManager;
 import com.facebook.presto.metadata.Metadata;
 import com.facebook.presto.security.AccessControlManager;
+import com.facebook.presto.server.security.JWTAuthenticatorManager;
 import com.facebook.presto.server.security.PasswordAuthenticatorManager;
 import com.facebook.presto.spi.CoordinatorPlugin;
 import com.facebook.presto.spi.Plugin;
@@ -39,6 +40,7 @@ import com.facebook.presto.spi.nodestatus.NodeStatusNotificationProviderFactory;
 import com.facebook.presto.spi.plan.PlanCheckerProviderFactory;
 import com.facebook.presto.spi.prerequisites.QueryPrerequisitesFactory;
 import com.facebook.presto.spi.resourceGroups.ResourceGroupConfigurationManagerFactory;
+import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
 import com.facebook.presto.spi.security.PasswordAuthenticatorFactory;
 import com.facebook.presto.spi.security.SystemAccessControlFactory;
 import com.facebook.presto.spi.session.SessionPropertyConfigurationManagerFactory;
@@ -115,6 +117,7 @@ public class PluginManager
     private final ResourceGroupManager<?> resourceGroupManager;
     private final AccessControlManager accessControlManager;
     private final PasswordAuthenticatorManager passwordAuthenticatorManager;
+    private final JWTAuthenticatorManager jwtAuthenticatorManager;
     private final EventListenerManager eventListenerManager;
     private final BlockEncodingManager blockEncodingManager;
     private final TempStorageManager tempStorageManager;
@@ -146,6 +149,7 @@ public class PluginManager
             QueryPreparerProviderManager queryPreparerProviderManager,
             AccessControlManager accessControlManager,
             PasswordAuthenticatorManager passwordAuthenticatorManager,
+            JWTAuthenticatorManager jwtAuthenticatorManager,
             EventListenerManager eventListenerManager,
             BlockEncodingManager blockEncodingManager,
             TempStorageManager tempStorageManager,
@@ -175,6 +179,7 @@ public class PluginManager
         this.resourceGroupManager = requireNonNull(resourceGroupManager, "resourceGroupManager is null");
         this.accessControlManager = requireNonNull(accessControlManager, "accessControlManager is null");
         this.passwordAuthenticatorManager = requireNonNull(passwordAuthenticatorManager, "passwordAuthenticatorManager is null");
+        this.jwtAuthenticatorManager = requireNonNull(jwtAuthenticatorManager, "jwtAuthenticatorManager is null");
         this.eventListenerManager = requireNonNull(eventListenerManager, "eventListenerManager is null");
         this.blockEncodingManager = requireNonNull(blockEncodingManager, "blockEncodingManager is null");
         this.tempStorageManager = requireNonNull(tempStorageManager, "tempStorageManager is null");
@@ -302,6 +307,11 @@ public class PluginManager
         for (PasswordAuthenticatorFactory authenticatorFactory : plugin.getPasswordAuthenticatorFactories()) {
             log.info("Registering password authenticator %s", authenticatorFactory.getName());
             passwordAuthenticatorManager.addPasswordAuthenticatorFactory(authenticatorFactory);
+        }
+
+        for (JWTAuthenticatorFactory jwtauthenticatorFactory : plugin.getJWTAuthenticatorFactories()) {
+            log.info("Registering jwt authenticator %s", jwtauthenticatorFactory.getName());
+            jwtAuthenticatorManager.addJWTAuthenticatorFactory(jwtauthenticatorFactory);
         }
 
         for (EventListenerFactory eventListenerFactory : plugin.getEventListenerFactories()) {
