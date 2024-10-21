@@ -18,6 +18,7 @@ import com.facebook.airlift.http.server.Authenticator;
 import com.facebook.airlift.http.server.CertificateAuthenticator;
 import com.facebook.airlift.http.server.KerberosAuthenticator;
 import com.facebook.airlift.http.server.KerberosConfig;
+import com.facebook.presto.jwt.Default.DefaultJsonWebTokenConfig;
 import com.facebook.presto.server.security.SecurityConfig.AuthenticationType;
 import com.google.inject.Binder;
 import com.google.inject.Scopes;
@@ -55,7 +56,7 @@ public class ServerSecurityModule
                 authBinder.addBinding().to(PasswordAuthenticator.class).in(Scopes.SINGLETON);
             }
             else if (authType == JWT) {
-                configBinder(binder).bindConfig(JsonWebTokenConfig.class);
+                configBinder(binder).bindConfig(DefaultJsonWebTokenConfig.class);
                 authBinder.addBinding().to(JsonWebTokenAuthenticator.class).in(Scopes.SINGLETON);
             }
             else {

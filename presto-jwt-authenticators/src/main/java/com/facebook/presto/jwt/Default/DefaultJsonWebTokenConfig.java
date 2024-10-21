@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.presto.server.security;
+package com.facebook.presto.jwt.Default;
 
 import com.facebook.airlift.configuration.Config;
 
-import javax.validation.constraints.NotNull;
+import com.facebook.presto.server.security.JWTAuthenticatorManager;
+import org.jetbrains.annotations.NotNull;
 
-public class JsonWebTokenConfig
-{
+public class DefaultJsonWebTokenConfig extends JWTAuthenticatorManager {
     private String keyFile;
     private String requiredIssuer;
     private String requiredAudience;
@@ -30,7 +30,7 @@ public class JsonWebTokenConfig
     }
 
     @Config("http.authentication.jwt.key-file")
-    public JsonWebTokenConfig setKeyFile(String keyFile)
+    public DefaultJsonWebTokenConfig setKeyFile(String keyFile)
     {
         this.keyFile = keyFile;
         return this;
@@ -42,7 +42,7 @@ public class JsonWebTokenConfig
     }
 
     @Config("http.authentication.jwt.required-issuer")
-    public JsonWebTokenConfig setRequiredIssuer(String requiredIssuer)
+    public DefaultJsonWebTokenConfig setRequiredIssuer(String requiredIssuer)
     {
         this.requiredIssuer = requiredIssuer;
         return this;
@@ -54,7 +54,7 @@ public class JsonWebTokenConfig
     }
 
     @Config("http.authentication.jwt.required-audience")
-    public JsonWebTokenConfig setRequiredAudience(String requiredAudience)
+    public DefaultJsonWebTokenConfig setRequiredAudience(String requiredAudience)
     {
         this.requiredAudience = requiredAudience;
         return this;

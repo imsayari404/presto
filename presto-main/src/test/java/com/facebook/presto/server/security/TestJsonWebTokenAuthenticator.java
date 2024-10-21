@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.Principal;
 
+import com.facebook.presto.jwt.Default.*;
 import static com.facebook.presto.server.security.ServletSecurityUtils.AUTHORIZED_IDENTITY_ATTRIBUTE;
 import static com.facebook.presto.server.security.ServletSecurityUtils.authorizedIdentity;
 import static com.facebook.presto.testing.assertions.Assert.assertEquals;
@@ -43,7 +44,6 @@ import static io.jsonwebtoken.security.Keys.secretKeyFor;
 import static java.nio.file.Files.readAllBytes;
 import static java.util.Base64.getMimeDecoder;
 import static java.util.Base64.getMimeEncoder;
-
 public class TestJsonWebTokenAuthenticator
 {
     private static final String KEY_ID_FOO = "foo";
@@ -51,7 +51,7 @@ public class TestJsonWebTokenAuthenticator
 
     private Path temporaryDirectory;
     private Path keyFile;
-    private JsonWebTokenConfig jsonWebTokenConfig;
+    private DefaultJsonWebTokenConfig jsonWebTokenConfig;
 
     @BeforeTest
     public void setup()
@@ -61,7 +61,7 @@ public class TestJsonWebTokenAuthenticator
         keyFile = temporaryDirectory.resolve(KEY_ID_FOO + ".key");
         byte[] key = getMimeEncoder().encode(secretKeyFor(HS256).getEncoded());
         Files.write(key, keyFile.toFile());
-        jsonWebTokenConfig = new JsonWebTokenConfig().setKeyFile(keyFile.toAbsolutePath().toString());
+        jsonWebTokenConfig = new DefaultJsonWebTokenConfig().setKeyFile(keyFile.toAbsolutePath().toString());
     }
 
     @AfterTest(alwaysRun = true)
