@@ -14,11 +14,13 @@
 package com.facebook.presto.jwt.Default;
 
 import com.facebook.airlift.configuration.Config;
-
 import com.facebook.presto.server.security.JWTAuthenticatorManager;
-import org.jetbrains.annotations.NotNull;
 
-public class DefaultJsonWebTokenConfig extends JWTAuthenticatorManager {
+import javax.validation.constraints.NotNull;
+
+public class DefaultJsonWebTokenConfig
+        extends JWTAuthenticatorManager
+{
     private String keyFile;
     private String requiredIssuer;
     private String requiredAudience;

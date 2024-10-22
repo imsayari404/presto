@@ -14,7 +14,8 @@
 package com.facebook.presto.spi.security;
 import java.util.Map;
 
-public interface JWTAuthenticatorFactory {
+public interface JWTAuthenticatorFactory
+{
     String getName();
 
     JWTAuthenticator create(Map<String, String> config);

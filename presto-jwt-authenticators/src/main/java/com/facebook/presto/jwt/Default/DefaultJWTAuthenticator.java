@@ -21,11 +21,21 @@ import com.facebook.presto.spi.security.AuthorizedIdentity;
 import com.facebook.presto.spi.security.JWTAuthenticator;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwsHeader;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.SigningKeyResolver;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.jackson.io.JacksonDeserializer;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.Key;
@@ -44,8 +54,9 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Base64.getMimeDecoder;
 import static java.util.Objects.requireNonNull;
 
-public class DefaultJWTAuthenticator implements JWTAuthenticator {
-
+public class DefaultJWTAuthenticator
+        implements JWTAuthenticator
+{
     private final JwtParser jwtParser;
     private final Function<JwsHeader<?>, Key> keyLoader;
     private static final String KEY_ID_VARIABLE = "${KID}";
@@ -53,10 +64,8 @@ public class DefaultJWTAuthenticator implements JWTAuthenticator {
     private static final String DEFAULT_KEY = "default-key";
     private static final CharMatcher INVALID_KID_CHARS = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(CharMatcher.anyOf("_-")).negate();
 
-
-
-    public DefaultJWTAuthenticator(JsonWebTokenConfig config) {
-
+    public DefaultJWTAuthenticator(JsonWebTokenConfig config)
+    {
         requireNonNull(config, "config is null");
         if (config.getKeyFile().contains(KEY_ID_VARIABLE)) {
             keyLoader = new DynamicKeyLoader(config.getKeyFile());
@@ -99,7 +108,8 @@ public class DefaultJWTAuthenticator implements JWTAuthenticator {
         return new AuthenticationException(message, "Bearer realm=\"Presto\", token_type=\"JWT\"");
     }
     @Override
-    public Principal createAuthenticatedPrincipal(String token) {
+    public Principal createAuthenticatedPrincipal(String token)
+    {
         try {
             Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
 
@@ -114,7 +124,8 @@ public class DefaultJWTAuthenticator implements JWTAuthenticator {
         catch (JwtException e) {
             try {
                 throw needAuthentication(e.getMessage());
-            } catch (AuthenticationException ex) {
+            }
+            catch (AuthenticationException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -236,5 +247,3 @@ public class DefaultJWTAuthenticator implements JWTAuthenticator {
         }
     }
 }
-
-
