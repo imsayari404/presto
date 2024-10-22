@@ -14,7 +14,6 @@
 
 package com.facebook.presto.jwt.Default;
 import com.facebook.airlift.bootstrap.Bootstrap;
-
 import com.facebook.presto.spi.security.JWTAuthenticator;
 import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
 import com.google.inject.Injector;
@@ -25,8 +24,9 @@ import java.util.Map;
 import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.google.common.base.Throwables.throwIfUnchecked;
 
-public class DefaultJWTAuthenticatorFactory implements JWTAuthenticatorFactory {
-
+public class DefaultJWTAuthenticatorFactory
+        implements JWTAuthenticatorFactory
+{
     @Override
     public String getName()
     {

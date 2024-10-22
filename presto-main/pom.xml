@@ -503,6 +503,12 @@
             <artifactId>ratis-common</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.facebook.presto</groupId>
+            <artifactId>presto-jwt-authenticators</artifactId>
+            <version>0.290-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

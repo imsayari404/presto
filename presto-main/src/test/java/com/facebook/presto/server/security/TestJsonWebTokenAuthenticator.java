@@ -14,6 +14,7 @@
 package com.facebook.presto.server.security;
 
 import com.facebook.airlift.http.server.AuthenticationException;
+import com.facebook.presto.jwt.Default.DefaultJsonWebTokenConfig;
 import com.facebook.presto.server.MockHttpServletRequest;
 import com.facebook.presto.spi.security.AuthorizedIdentity;
 import com.google.common.collect.ImmutableListMultimap;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.Principal;
 
-import com.facebook.presto.jwt.Default.*;
 import static com.facebook.presto.server.security.ServletSecurityUtils.AUTHORIZED_IDENTITY_ATTRIBUTE;
 import static com.facebook.presto.server.security.ServletSecurityUtils.authorizedIdentity;
 import static com.facebook.presto.testing.assertions.Assert.assertEquals;

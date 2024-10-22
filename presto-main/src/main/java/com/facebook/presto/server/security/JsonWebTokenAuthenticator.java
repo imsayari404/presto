@@ -15,32 +15,17 @@ package com.facebook.presto.server.security;
 
 import com.facebook.airlift.http.server.AuthenticationException;
 import com.facebook.airlift.http.server.Authenticator;
-import com.facebook.airlift.security.pem.PemReader;
-import com.facebook.presto.spi.security.AuthorizedIdentity;
 import com.google.common.base.CharMatcher;
-import com.google.common.collect.ImmutableMap;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.jackson.io.JacksonDeserializer;
-import javax.crypto.spec.SecretKeySpec;
+import io.jsonwebtoken.JwtException;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.security.Key;
-import java.security.Principal;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 
-import static com.facebook.presto.server.security.ServletSecurityUtils.AUTHORIZED_IDENTITY_ATTRIBUTE;
+import java.security.Principal;
+
 import static com.google.common.base.CharMatcher.inRange;
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.nullToEmpty;
-import static com.google.common.io.Files.asCharSource;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.util.Base64.getMimeDecoder;
 import static java.util.Objects.requireNonNull;
 
 public class JsonWebTokenAuthenticator
@@ -50,9 +35,7 @@ public class JsonWebTokenAuthenticator
     private static final CharMatcher INVALID_KID_CHARS = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(CharMatcher.anyOf("_-")).negate();
     private static final String KEY_ID_VARIABLE = "${KID}";
 
-
-
-    private  JWTAuthenticatorManager authenticatorManager;
+    private JWTAuthenticatorManager authenticatorManager;
 
     @Inject
     public JsonWebTokenAuthenticator(JWTAuthenticatorManager authenticatorManager)

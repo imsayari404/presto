@@ -15,7 +15,8 @@ package com.facebook.presto.spi.security;
 
 import java.security.Principal;
 
-public interface JWTAuthenticator {
+public interface JWTAuthenticator
+{
     /**
      * Authenticate the provided token.
      *
