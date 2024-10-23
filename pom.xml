@@ -271,6 +271,12 @@
 
             <dependency>
                 <groupId>com.facebook.presto</groupId>
+                <artifactId>presto-jwt-authenticators</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.facebook.presto</groupId>
                 <artifactId>presto-session-property-managers</artifactId>
                 <version>${project.version}</version>
             </dependency>

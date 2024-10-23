@@ -138,11 +138,6 @@
 
         <dependency>
             <groupId>com.facebook.airlift</groupId>
-            <artifactId>security</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.facebook.airlift</groupId>
             <artifactId>jaxrs</artifactId>
         </dependency>
 
@@ -366,10 +361,6 @@
             <artifactId>jjwt-impl</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.datasketches</groupId>
@@ -502,12 +493,6 @@
             <groupId>org.apache.ratis</groupId>
             <artifactId>ratis-common</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.facebook.presto</groupId>
-            <artifactId>presto-jwt-authenticators</artifactId>
-            <version>0.290-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
