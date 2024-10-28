@@ -15,6 +15,7 @@ package com.facebook.presto.server.security;
 
 import com.facebook.airlift.http.server.AuthenticationException;
 import com.facebook.airlift.http.server.Authenticator;
+import com.facebook.presto.commonjwt.DefaultJsonWebTokenConfig;
 import com.google.common.base.CharMatcher;
 import io.jsonwebtoken.JwtException;
 
@@ -34,7 +35,7 @@ public class JsonWebTokenAuthenticator
     private static final String DEFAULT_KEY = "default-key";
     private static final CharMatcher INVALID_KID_CHARS = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(CharMatcher.anyOf("_-")).negate();
     private static final String KEY_ID_VARIABLE = "${KID}";
-
+    private DefaultJsonWebTokenConfig jsonWebTokenConfig;
     private JWTAuthenticatorManager authenticatorManager;
 
     @Inject
@@ -42,6 +43,11 @@ public class JsonWebTokenAuthenticator
     {
         this.authenticatorManager = requireNonNull(authenticatorManager, "authenticatorManager is null");
         authenticatorManager.setRequired();
+    }
+
+    public JsonWebTokenAuthenticator(DefaultJsonWebTokenConfig jsonWebTokenConfig)
+    {
+        this.jsonWebTokenConfig = requireNonNull(jsonWebTokenConfig, "config is null");
     }
 
     @Override

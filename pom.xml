@@ -202,6 +202,7 @@
         <module>presto-hana</module>
         <module>presto-openapi</module>
         <module>presto-jwt-authenticators</module>
+        <module>presto-common-jwt</module>
     </modules>
 
     <dependencyManagement>

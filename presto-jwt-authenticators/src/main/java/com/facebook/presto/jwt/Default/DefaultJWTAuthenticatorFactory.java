@@ -14,6 +14,7 @@
 
 package com.facebook.presto.jwt.Default;
 import com.facebook.airlift.bootstrap.Bootstrap;
+import com.facebook.presto.commonjwt.DefaultJsonWebTokenConfig;
 import com.facebook.presto.spi.security.JWTAuthenticator;
 import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
 import com.google.inject.Injector;
