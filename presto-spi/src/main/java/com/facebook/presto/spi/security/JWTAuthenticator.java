@@ -13,6 +13,8 @@
  */
 package com.facebook.presto.spi.security;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.security.Principal;
 
 public interface JWTAuthenticator
@@ -23,5 +25,5 @@ public interface JWTAuthenticator
      * @return the authenticated Principal
      * @throws AccessDeniedException if not allowed
      */
-    Principal createAuthenticatedPrincipal(String token);
+    Principal createAuthenticatedPrincipal(String token, HttpServletRequest request);
 }

@@ -11,8 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.presto.jwt.Default;
+package com.facebook.presto.jwt;
 
+import com.facebook.presto.jwt.defaults.DefaultJWTAuthenticatorFactory;
 import com.facebook.presto.spi.Plugin;
 import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
 import com.google.common.collect.ImmutableList;

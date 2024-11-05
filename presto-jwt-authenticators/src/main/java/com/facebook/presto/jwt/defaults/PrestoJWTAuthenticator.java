@@ -11,20 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.presto.jwt.Default;
+package com.facebook.presto.jwt.defaults;
 
-import com.facebook.airlift.http.server.AuthenticationException;
 import com.facebook.airlift.http.server.BasicPrincipal;
-import com.facebook.airlift.http.server.JsonWebTokenConfig;
 import com.facebook.airlift.security.pem.PemReader;
 import com.facebook.presto.spi.security.AuthorizedIdentity;
 import com.facebook.presto.spi.security.JWTAuthenticator;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -53,18 +51,20 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Base64.getMimeDecoder;
 import static java.util.Objects.requireNonNull;
-
-public class DefaultJWTAuthenticator
+public class PrestoJWTAuthenticator
         implements JWTAuthenticator
 {
-    private final JwtParser jwtParser;
-    private final Function<JwsHeader<?>, Key> keyLoader;
     private static final String KEY_ID_VARIABLE = "${KID}";
-    private HttpServletRequest request;
     private static final String DEFAULT_KEY = "default-key";
     private static final CharMatcher INVALID_KID_CHARS = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(CharMatcher.anyOf("_-")).negate();
 
-    public DefaultJWTAuthenticator(JsonWebTokenConfig config)
+    private final JwtParser jwtParser;
+    private final Function<JwsHeader<?>, Key> keyLoader;
+
+    private HttpServletRequest request;
+
+    @Inject
+    public PrestoJWTAuthenticator(DefaultJsonWebTokenConfig config)
     {
         requireNonNull(config, "config is null");
         if (config.getKeyFile().contains(KEY_ID_VARIABLE)) {
@@ -103,35 +103,20 @@ public class DefaultJWTAuthenticator
         this.jwtParser = jwtParser;
     }
 
-    private static AuthenticationException needAuthentication(String message)
-    {
-        return new AuthenticationException(message, "Bearer realm=\"Presto\", token_type=\"JWT\"");
-    }
     @Override
-    public Principal createAuthenticatedPrincipal(String token)
+    public Principal createAuthenticatedPrincipal(String token, HttpServletRequest request)
     {
-        try {
-            Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
+        Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
 
-            AuthorizedIdentity authorizedIdentity = claimsJws.getBody().get(AUTHORIZED_IDENTITY_ATTRIBUTE, AuthorizedIdentity.class);
-            if (authorizedIdentity != null) {
-                setAuthorizedIdentity(request, authorizedIdentity);
-            }
-
-            String subject = claimsJws.getBody().getSubject();
-            return new BasicPrincipal(subject);
+        AuthorizedIdentity authorizedIdentity = claimsJws.getBody().get(AUTHORIZED_IDENTITY_ATTRIBUTE, AuthorizedIdentity.class);
+        if (authorizedIdentity != null) {
+            setAuthorizedIdentity(request, authorizedIdentity);
         }
-        catch (JwtException e) {
-            try {
-                throw needAuthentication(e.getMessage());
-            }
-            catch (AuthenticationException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
+        String subject = claimsJws.getBody().getSubject();
+        return new BasicPrincipal(subject);
     }
 
-    public static class StaticKeyLoader
+    private static class StaticKeyLoader
             implements Function<JwsHeader<?>, Key>
     {
         private final LoadedKey key;
@@ -151,7 +136,7 @@ public class DefaultJWTAuthenticator
         }
     }
 
-    public static class DynamicKeyLoader
+    private static class DynamicKeyLoader
             implements Function<JwsHeader<?>, Key>
     {
         private final String keyFile;

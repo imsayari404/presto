@@ -309,9 +309,9 @@ public class PluginManager
             passwordAuthenticatorManager.addPasswordAuthenticatorFactory(authenticatorFactory);
         }
 
-        for (JWTAuthenticatorFactory jwtauthenticatorFactory : plugin.getJWTAuthenticatorFactories()) {
-            log.info("Registering jwt authenticator %s", jwtauthenticatorFactory.getName());
-            jwtAuthenticatorManager.addJWTAuthenticatorFactory(jwtauthenticatorFactory);
+        for (JWTAuthenticatorFactory jwtAuthenticatorFactory : plugin.getJWTAuthenticatorFactories()) {
+            log.info("Registering jwt authenticator %s", jwtAuthenticatorFactory.getName());
+            jwtAuthenticatorManager.addJWTAuthenticatorFactory(jwtAuthenticatorFactory);
         }
 
         for (EventListenerFactory eventListenerFactory : plugin.getEventListenerFactories()) {

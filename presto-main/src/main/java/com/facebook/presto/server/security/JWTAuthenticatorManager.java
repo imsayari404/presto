@@ -75,7 +75,7 @@ public class JWTAuthenticatorManager
         JWTAuthenticator authenticator = factory.create(ImmutableMap.copyOf(properties));
         this.authenticator.set(requireNonNull(authenticator, "authenticator is null"));
 
-        log.info("-- JWT authenticator %s --", name);
+        log.info("-- Loaded JWT authenticator %s --", name);
     }
 
     public JWTAuthenticator getAuthenticator()

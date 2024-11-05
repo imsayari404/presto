@@ -15,7 +15,6 @@ package com.facebook.presto.server.security;
 
 import com.facebook.airlift.http.server.AuthenticationException;
 import com.facebook.airlift.http.server.Authenticator;
-import com.google.common.base.CharMatcher;
 import io.jsonwebtoken.JwtException;
 
 import javax.inject.Inject;
@@ -23,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.security.Principal;
 
-import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.util.Objects.requireNonNull;
@@ -31,10 +29,6 @@ import static java.util.Objects.requireNonNull;
 public class JsonWebTokenAuthenticator
         implements Authenticator
 {
-    private static final String DEFAULT_KEY = "default-key";
-    private static final CharMatcher INVALID_KID_CHARS = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(CharMatcher.anyOf("_-")).negate();
-    private static final String KEY_ID_VARIABLE = "${KID}";
-
     private JWTAuthenticatorManager authenticatorManager;
 
     @Inject
@@ -60,7 +54,7 @@ public class JsonWebTokenAuthenticator
         }
 
         try {
-            return authenticatorManager.getAuthenticator().createAuthenticatedPrincipal(token);
+            return authenticatorManager.getAuthenticator().createAuthenticatedPrincipal(token, request);
         }
         catch (JwtException e) {
             throw needAuthentication(e.getMessage());

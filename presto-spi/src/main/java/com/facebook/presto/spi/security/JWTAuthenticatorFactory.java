@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 package com.facebook.presto.spi.security;
+
 import java.util.Map;
 
 public interface JWTAuthenticatorFactory
