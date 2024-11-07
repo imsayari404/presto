@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.presto.jwt.defaults;
+package com.facebook.presto.jwt;
 
 import com.facebook.airlift.http.server.BasicPrincipal;
 import com.facebook.airlift.security.pem.PemReader;
@@ -64,7 +64,7 @@ public class PrestoJWTAuthenticator
     private HttpServletRequest request;
 
     @Inject
-    public PrestoJWTAuthenticator(DefaultJsonWebTokenConfig config)
+    public PrestoJWTAuthenticator(PrestoJWTConfig config)
     {
         requireNonNull(config, "config is null");
         if (config.getKeyFile().contains(KEY_ID_VARIABLE)) {

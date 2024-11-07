@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.jwt;
 
-import com.facebook.presto.jwt.defaults.DefaultJWTAuthenticatorFactory;
 import com.facebook.presto.spi.Plugin;
 import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
 import com.google.common.collect.ImmutableList;
@@ -25,7 +24,7 @@ public class JWTAuthenticatorPlugin
     public Iterable<JWTAuthenticatorFactory> getJWTAuthenticatorFactories()
     {
         return ImmutableList.<JWTAuthenticatorFactory>builder()
-                .add(new DefaultJWTAuthenticatorFactory())
+                .add(new PrestoJWTAuthenticatorFactory())
                 .build();
     }
 }

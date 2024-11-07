@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.facebook.presto.jwt.defaults;
+package com.facebook.presto.jwt;
 
 import com.facebook.airlift.bootstrap.Bootstrap;
 import com.facebook.presto.spi.security.JWTAuthenticator;
@@ -25,7 +25,7 @@ import java.util.Map;
 import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.google.common.base.Throwables.throwIfUnchecked;
 
-public class DefaultJWTAuthenticatorFactory
+public class PrestoJWTAuthenticatorFactory
         implements JWTAuthenticatorFactory
 {
     @Override
@@ -40,7 +40,7 @@ public class DefaultJWTAuthenticatorFactory
         try {
             Bootstrap app = new Bootstrap(
                     binder -> {
-                        configBinder(binder).bindConfig(DefaultJsonWebTokenConfig.class);
+                        configBinder(binder).bindConfig(PrestoJWTConfig.class);
                         binder.bind(PrestoJWTAuthenticator.class).in(Scopes.SINGLETON);
                     });
 
