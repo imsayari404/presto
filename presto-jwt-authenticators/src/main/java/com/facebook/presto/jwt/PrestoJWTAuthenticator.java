@@ -51,6 +51,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Base64.getMimeDecoder;
 import static java.util.Objects.requireNonNull;
+
 public class PrestoJWTAuthenticator
         implements JWTAuthenticator
 {
@@ -60,8 +61,6 @@ public class PrestoJWTAuthenticator
 
     private final JwtParser jwtParser;
     private final Function<JwsHeader<?>, Key> keyLoader;
-
-    private HttpServletRequest request;
 
     @Inject
     public PrestoJWTAuthenticator(PrestoJWTConfig config)

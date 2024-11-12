@@ -31,7 +31,7 @@ public class PrestoJWTAuthenticatorFactory
     @Override
     public String getName()
     {
-        return "default-jwt";
+        return "presto-jwt";
     }
 
     @Override
