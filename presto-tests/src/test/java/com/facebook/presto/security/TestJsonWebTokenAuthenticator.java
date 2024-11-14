@@ -14,11 +14,13 @@
 package com.facebook.presto.security;
 
 import com.facebook.airlift.http.server.AuthenticationException;
-import com.facebook.presto.jwt.PrestoJWTConfig;
+import com.facebook.presto.jwt.PrestoJWTAuthenticatorFactory;
 import com.facebook.presto.server.MockHttpServletRequest;
+import com.facebook.presto.server.security.JWTAuthenticatorManager;
 import com.facebook.presto.server.security.JsonWebTokenAuthenticator;
 import com.facebook.presto.spi.security.AuthorizedIdentity;
-import com.facebook.presto.tests.JWTAuthenticatorManager;
+import com.facebook.presto.spi.security.JWTAuthenticator;
+import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
@@ -32,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.facebook.presto.server.security.ServletSecurityUtils.AUTHORIZED_IDENTITY_ATTRIBUTE;
 import static com.facebook.presto.server.security.ServletSecurityUtils.authorizedIdentity;
@@ -54,7 +58,7 @@ public class TestJsonWebTokenAuthenticator
 
     private Path temporaryDirectory;
     private Path keyFile;
-    private PrestoJWTConfig jsonWebTokenConfig;
+    private JWTAuthenticatorManager jwtAuthenticatorManager;
 
     @BeforeTest
     public void setup()
@@ -64,7 +68,12 @@ public class TestJsonWebTokenAuthenticator
         keyFile = temporaryDirectory.resolve(KEY_ID_FOO + ".key");
         byte[] key = getMimeEncoder().encode(secretKeyFor(HS256).getEncoded());
         Files.write(key, keyFile.toFile());
-        jsonWebTokenConfig = new PrestoJWTConfig().setKeyFile(keyFile.toAbsolutePath().toString());
+        jwtAuthenticatorManager = new JWTAuthenticatorManager();
+        Map<String, String> properties = new HashMap<>();
+        properties.put("http.authentication.jwt.key-file", keyFile.toAbsolutePath().toString());
+        JWTAuthenticatorFactory factory = new PrestoJWTAuthenticatorFactory();
+        JWTAuthenticator authenticator = factory.create(ImmutableMap.copyOf(properties));
+        jwtAuthenticatorManager.setAuthenticator(authenticator);
     }
 
     @AfterTest(alwaysRun = true)
@@ -84,7 +93,7 @@ public class TestJsonWebTokenAuthenticator
                 ImmutableListMultimap.of(AUTHORIZATION, "Bearer " + jsonWebToken),
                 "remoteAddress",
                 ImmutableMap.of());
-        JWTAuthenticatorManager jwtAuthenticatorManager = new JWTAuthenticatorManager();
+
         Principal principal = new JsonWebTokenAuthenticator(jwtAuthenticatorManager).authenticate(request);
 
         assertEquals(principal.getName(), TEST_PRINCIPAL);

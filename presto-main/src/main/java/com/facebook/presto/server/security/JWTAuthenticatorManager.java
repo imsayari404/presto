@@ -16,6 +16,7 @@ package com.facebook.presto.server.security;
 import com.facebook.airlift.log.Logger;
 import com.facebook.presto.spi.security.JWTAuthenticator;
 import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
@@ -41,6 +42,12 @@ public class JWTAuthenticatorManager
     private final AtomicBoolean required = new AtomicBoolean();
     private final Map<String, JWTAuthenticatorFactory> factories = new ConcurrentHashMap<>();
     private final AtomicReference<JWTAuthenticator> authenticator = new AtomicReference<>();
+
+    @VisibleForTesting
+    public void setAuthenticator(JWTAuthenticator authenticator)
+    {
+        this.authenticator.set(requireNonNull(authenticator, "authenticator is null"));
+    }
 
     public void setRequired()
     {
