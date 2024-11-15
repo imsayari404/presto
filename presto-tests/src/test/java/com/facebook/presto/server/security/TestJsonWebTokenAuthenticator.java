@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.presto.security;
+package com.facebook.presto.server.security;
 
 import com.facebook.airlift.http.server.AuthenticationException;
 import com.facebook.presto.jwt.PrestoJWTAuthenticatorFactory;
