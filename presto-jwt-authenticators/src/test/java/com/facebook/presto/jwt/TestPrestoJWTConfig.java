@@ -22,7 +22,7 @@ import java.util.Map;
 
 import static com.facebook.airlift.configuration.testing.ConfigAssertions.assertRecordedDefaults;
 
-public class TestJsonWebTokenConfig
+public class TestPrestoJWTConfig
 {
     @Test
     public void testDefaults()
