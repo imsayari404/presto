@@ -16,8 +16,6 @@ package com.facebook.presto.server.security;
 import com.facebook.airlift.http.server.AuthenticationException;
 import com.facebook.presto.jwt.PrestoJWTAuthenticatorFactory;
 import com.facebook.presto.server.MockHttpServletRequest;
-import com.facebook.presto.server.security.JWTAuthenticatorManager;
-import com.facebook.presto.server.security.JsonWebTokenAuthenticator;
 import com.facebook.presto.spi.security.AuthorizedIdentity;
 import com.facebook.presto.spi.security.JWTAuthenticator;
 import com.facebook.presto.spi.security.JWTAuthenticatorFactory;
