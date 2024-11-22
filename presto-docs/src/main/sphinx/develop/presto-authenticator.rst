@@ -2,13 +2,13 @@
 Custom Presto Authenticator
 ===========================
 
-Presto supports authentication via a custom presto authenticator
+Presto supports authentication through a custom Presto authenticator
 that validates the request and creates a principal.
 
 Implementation
 --------------
 
-``PrestoAuthenticatorFactory`` is responsible for creating a
+``PrestoAuthenticatorFactory`` creates a
 ``PrestoAuthenticator`` instance. It also defines the name of this
 authenticator which is used by the administrator in a Presto configuration.
 
@@ -44,7 +44,7 @@ Example configuration file:
 Additionally, the coordinator must be configured to use custom authentication
 and have HTTPS enabled.
 
-Below property needs to be added to the coordinator's ``config.properties`` file:
+Add the property shown below to the coordinator's ``config.properties`` file:
 
 .. code-block:: none
 
