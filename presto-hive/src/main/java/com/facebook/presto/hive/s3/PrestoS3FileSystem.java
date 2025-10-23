@@ -621,10 +621,15 @@ public class PrestoS3FileSystem
     {
         Map<String, String> userMetadata = response.metadata();
         String length = userMetadata.get("unencrypted-content-length");
-        if (response.serverSideEncryption() != null && length == null) {
-            throw new IOException(format("unencrypted-content-length header is not set on an encrypted object: %s", path));
+
+        if (response.serverSideEncryption() != null && response.serverSideEncryption() != ServerSideEncryption.UNKNOWN_TO_SDK_VERSION) {
+            if (length != null) {
+                return Long.parseLong(length);
+            }
+            log.debug("Encrypted object %s missing unencrypted-content-length header, using contentLength", path);
         }
-        return (length != null) ? Long.parseLong(length) : response.contentLength();
+
+        return response.contentLength();
     }
 
     @VisibleForTesting
