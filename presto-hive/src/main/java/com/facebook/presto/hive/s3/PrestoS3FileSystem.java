@@ -322,11 +322,7 @@ public class PrestoS3FileSystem
     public FileStatus getFileStatus(Path path) throws IOException
     {
         if (path.getName().isEmpty()) {
-            // the bucket root requires special handling
-            if (getS3ObjectMetadata(path).getObjectResponse() != null) {
-                return new FileStatus(0, true, 1, 0, 0, qualifiedPath(path));
-            }
-            throw new FileNotFoundException("File does not exist: " + path);
+            return new FileStatus(0, true, 1, 0, 0, qualifiedPath(path));
         }
 
         PrestoS3ObjectMetadata metadata = getS3ObjectMetadata(path);
@@ -645,6 +641,10 @@ public class PrestoS3FileSystem
 
     private HeadObjectResponse getS3ObjectMetadata(Path path, String bucketName, String key) throws IOException
     {
+        if (key == null || key.isEmpty()) {
+            return null;
+        }
+
         try {
             return retry()
                     .maxAttempts(maxAttempts)
