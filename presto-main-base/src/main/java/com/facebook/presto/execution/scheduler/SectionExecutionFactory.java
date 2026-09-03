@@ -323,7 +323,8 @@ public class SectionExecutionFactory
             Set<SqlStageExecution> childStageExecutions,
             CTEMaterializationTracker cteMaterializationTracker)
     {
-        Map<PlanNodeId, SplitSource> splitSources = splitSourceFactory.createSplitSources(plan.getFragment(), session, tableWriteInfo);
+        SplitSourceFactory.SplitSourcesResult splitSourcesResult = splitSourceFactory.createSplitSources(plan.getFragment(), session, tableWriteInfo);
+        Map<PlanNodeId, SplitSource> splitSources = splitSourcesResult.getSplitSources();
         int maxTasksPerStage = getMaxTasksPerStage(session);
         Optional<Predicate<Node>> nodePredicate = getNodePoolSelectionPredicate(plan);
         if (partitioningHandle.equals(SOURCE_DISTRIBUTION)) {
@@ -339,7 +340,7 @@ public class SectionExecutionFactory
             SplitPlacementPolicy placementPolicy = new DynamicSplitPlacementPolicy(nodeSelector, stageExecution::getAllTasks);
 
             checkArgument(!plan.getFragment().getStageExecutionDescriptor().isStageGroupedExecution());
-            splitSourceFactory.setTaskCountHint(nodeSelector.getActiveNodes().size());
+            SplitSourceFactory.setTaskCountHint(splitSourcesResult.getDynamicFilters(), nodeSelector.getActiveNodes().size());
 
             boolean hasDpp = isDistributedDynamicFilterEnabled(session)
                     && !dynamicFilterService.getAllFiltersForQuery(session.getQueryId()).isEmpty();
@@ -401,7 +402,7 @@ public class SectionExecutionFactory
             if (!splitSources.isEmpty() && (plan.getFragment().getPartitioning().equals(SINGLE_DISTRIBUTION))) {
                 NodeSelector nodeSelector = nodeScheduler.createNodeSelector(session, null, nodePredicate);
                 List<InternalNode> nodes = nodeSelector.selectRandomNodes(1);
-                splitSourceFactory.setTaskCountHint(nodes.size());
+                SplitSourceFactory.setTaskCountHint(splitSourcesResult.getDynamicFilters(), nodes.size());
                 if (isDistributedDynamicFilterEnabled(session)) {
                     setExpectedPartitionsForFilters(dynamicFilterService, session.getQueryId(), plan.getFragment().getRoot(), nodes.size());
                 }
@@ -484,7 +485,7 @@ public class SectionExecutionFactory
                     bucketNodeMap = nodePartitionMap.asBucketNodeMap();
                 }
 
-                splitSourceFactory.setTaskCountHint(stageNodeList.size());
+                SplitSourceFactory.setTaskCountHint(splitSourcesResult.getDynamicFilters(), stageNodeList.size());
                 if (isDistributedDynamicFilterEnabled(session)) {
                     setExpectedPartitionsForFilters(dynamicFilterService, session.getQueryId(), plan.getFragment().getRoot(), stageNodeList.size());
                 }
@@ -570,6 +571,13 @@ public class SectionExecutionFactory
     {
         // Broadcast-build joins always have exactly 1 build partition (the single broadcast task),
         // so their filter should wait for 1 partition, not taskCount.
+        //
+        // Safety: JoinDynamicFilter.setExpectedPartitions() has a one-shot verify guard. This is
+        // safe because each JoinDynamicFilter belongs to exactly one join node in one fragment, and
+        // the three call sites of this method are in mutually exclusive scheduling branches
+        // (SOURCE_DISTRIBUTION → deferred via state-change listener, SINGLE_DISTRIBUTION else-if,
+        // and fixed-partitioned else-if). A given fragment enters exactly one branch, so each
+        // filter's setExpectedPartitions() is called at most once.
         forEachJoinDynamicFilter(dynamicFilterService, queryId, root, (filter, isBroadcastBuild) -> filter.setExpectedPartitions(isBroadcastBuild ? 1 : taskCount));
     }
 
@@ -594,6 +602,20 @@ public class SectionExecutionFactory
         }
     }
 
+    /**
+     * Returns {@code true} if the build subtree is fed by a replicated (broadcast) exchange.
+     *
+     * <p>After stage-splitting, every cross-fragment data flow in a fragment is represented by
+     * a {@link RemoteSourceNode} leaf — the node has no children and cannot be recursed into.
+     * {@link com.facebook.presto.sql.planner.optimizations.PlanNodeSearcher#findFirst()} uses
+     * depth-first pre-order traversal, so it always returns the topmost {@code RemoteSourceNode}
+     * in the build subtree first. Because that node is a leaf, it is always the direct build
+     * exchange for this join — there is no risk of "finding the wrong" node from a nested join
+     * deeper in the build side (a nested join on the build side of another join in the same
+     * fragment would be an inline join, not a remote source, and its own build RemoteSourceNode
+     * would only be reachable after first passing through the RemoteSourceNode of the outer
+     * build exchange).
+     */
     private static boolean buildSubtreeIsReplicated(PlanNode buildSubtree)
     {
         return PlanNodeSearcher.searchFrom(buildSubtree)
